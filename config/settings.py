@@ -4,16 +4,16 @@ from pathlib import Path
 
 
 # ----- mcmeta data (recipes, loot tables, item tags) -----
-MC_VERSION = "1.21.1-data"
+# MC_VERSION = "1.21.1-data"
 
-MCMETA_REPO = "misode/mcmeta"
-MCMETA_RAW_BASE = f"https://raw.githubusercontent.com/{MCMETA_REPO}/{MC_VERSION}/"
-MCMETA_TREE_API = (f"https://api.github.com/repos/{MCMETA_REPO}/git/trees/{MC_VERSION}?recursive=1")
+# MCMETA_REPO = "misode/mcmeta"
+# MCMETA_RAW_BASE = f"https://raw.githubusercontent.com/{MCMETA_REPO}/{MC_VERSION}/"
+# MCMETA_TREE_API = (f"https://api.github.com/repos/{MCMETA_REPO}/git/trees/{MC_VERSION}?recursive=1")
 
 # mcmeta file paths
-RECIPE_PATH = "data/minecraft/recipe"
-LOOT_TABLE_PATH = "data/minecraft/loot_table"
-ITEM_TAGS_PATH = "data/minecraft/tags/item"
+RECIPE_PATH = "data/raw/minecraft/recipe"
+LOOT_TABLE_PATH = "data/raw/minecraft/loot_table"
+ITEM_TAGS_PATH = "data/raw/minecraft/tags/item"
 
 
 # ----- local layout -----
