@@ -36,3 +36,72 @@ RANDOM_SEED = 510
 LOOTING_LEVEL = 0
 
 
+# testing items
+TEST_ITEMS = [
+    # pure deterministic cheap items
+    "oak_planks",
+    "stick",
+    "crafting_table",
+    "torch",
+    "furnace",
+    "iron_pickaxe",
+    "iron_sword",
+    "bucket",
+    "clock",
+    "golden_apple",
+    # mixed deterministic recipe with random loot table
+    "blaze_powder",
+    "fire_charge",
+    "brewing_stand",
+    "ender_eye",
+    "beacon",
+    # pure random loot table items
+    "ender_pearl",
+    "blaze_rod",
+    "totem_of_undying",
+    "trident",
+    "nether_star",
+]
+
+# test tiers (will get rid of this later, but for now just to test the simulation)
+TEST_TIERS = {
+    "oak_planks": "trivial",
+    "stick": "trivial",
+    "crafting_table": "trivial",
+    "torch": "trivial",
+    "furnace": "trivial",
+    "iron_pickaxe": "common",
+    "iron_sword": "common",
+    "bucket": "common",
+    "clock": "common",
+    "golden_apple": "common",
+    "blaze_powder": "rare",
+    "fire_charge": "rare",
+    "brewing_stand": "rare",
+    "ender_eye": "rare",
+    "beacon": "rare",
+    "ender_pearl": "legendary",
+    "blaze_rod": "legendary",
+    "totem_of_undying": "legendary",
+    "trident": "legendary",
+    "nether_star": "legendary",
+}
+
+# recipe types
+SUPPORTED_RECIPE_TYPES = (
+    "minecraft:crafting_shaped",
+    "minecraft:crafting_shapeless",
+    "minecraft:smelting",
+)
+
+# if an item has more than one recipe, we will only consider the first suported one for now
+RECIPE_PRIORITY = {
+    "minecraft:smelting": 0,
+    "minecraft:crafting_shaped": 1,
+    "minecraft:crafting_shapeless": 2,
+}
+
+# loot table types (also used to break ties when several tables can get the same item)
+LOOT_TABLE_PRIORITY = ("entities", "blocks", "gameplay", "chests", "archaeology")
+
+KMEANS_CLUSTERS = 4
