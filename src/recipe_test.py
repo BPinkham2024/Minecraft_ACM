@@ -33,6 +33,20 @@ def get_ingredients_list_shapeless(item_json) -> list:
 		]
 	return ingredient_list
 
+def get_recursive_items(item_json):
+	if "shapeless" in str(loaded_item_json.get("type")):
+		ingredient_list = get_ingredients_list_shapeless(loaded_item_json)
+	elif "shaped" in str(loaded_item_json.get("type")):
+		ingredient_list = get_ingredients_list_shaped(loaded_item_json)
+	else:
+		print(f"{item_name} is {loaded_item_json.get("type")}")
+		ingredient_list = []
+
+	
+	
+	
+	return ingredient_list
+
 # # Extract ingredients needed to craft acacia_boat
 # ingredients = loaded_item_json.get("key", [])
 # key = ingredients.keys()  # Get the keys from the ingredients dictionary
@@ -45,14 +59,8 @@ def get_ingredients_list_shapeless(item_json) -> list:
 # 	print(f"Ingredient: {ingredient}, Item ID: {item_id}")
 
 
-if "shapeless" in str(loaded_item_json.get("type")):
-	ingredient_list = get_ingredients_list_shapeless(loaded_item_json)
-elif "shaped" in str(loaded_item_json.get("type")):
-	ingredient_list = get_ingredients_list_shaped(loaded_item_json)
-else:
-	print(f"{item_name} is {loaded_item_json.get("type")}")
-	ingredient_list = []
 
+ingredient_list = get_recursive_items(loaded_item_json)
 
 print("Items:\n{")
 for ing in ingredient_list:
