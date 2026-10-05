@@ -3,6 +3,7 @@
 from pathlib import Path
 import json
 from dataclasses import dataclass
+import pandas as pd
 
 def identifier(path, root):
     """Vanilla files use paths relative to each data category as resource IDs.
@@ -110,3 +111,56 @@ def collect_loot_items(value, inventory):
     elif isinstance(value, list):
         for child in value:
             collect_loot_items(child, value)
+
+def injest(raw):
+    """Parse categories and normalize the inventory and slot-level graph edges.
+    A slot's alternatives are OR choices. Distinct slots are AND requirements.
+    Edge rows retain recipe identity, slot position, and output quantity.
+    """
+
+    raw = Path(raw)
+    for folder in ('recipes', 'tags/items', 'loot_tables'):
+        if not (raw / folder).is_dir():
+            raise ValueError(f"Missing input directory {raw / folder}")
+    recipe_data = load_category(raw / 'recipes')
+    tags = Tags(load_category(raw / 'tags/items'))
+    loot = load_category(raw / 'loot_tables')
+    recipes, skipped, edges = [], [], []
+
+    inventory = set()
+    for name in tags.values:
+        inventory.update(tags.resolve(name))
+    for name, data in recipe_data.items():
+        recipe = parse_recipe(name, data, tags)
+        if recipe == None:
+            skipped.append({'recipe': name, 'type': data['type'].split(':')[-1],
+                            'reason': "dynamic output / NBT transformation"})
+            continue
+        recipes.append(recipe)
+        inventory.add(recipe.output)
+        for slot, options in enumerate(recipe.slots):
+            inventory.update(options)
+            for item in options:
+                edges.append({'recipe': name, 'ingredient': item, 'output': recipe.output,
+                                'slot': slot, 'output_count': recipe.count})
+    
+    collect_loot_items(list(loot.values()), inventory)
+
+    # unique keys will make all following one to one joins verifyable
+    items = pd.json_normalize([{'item': item} for item in sorted(inventory)]).drop_duplicates('item')
+    edge_frame = pd.json_normalize(edges).drop_duplicates()
+    return recipes, tags, loot, items, edge_frame, skipped
+
+@dataclass
+class InputData:
+    """For easier use along the pipeline as opposed to using a tuple"""
+    recipes: list
+    tags: Tags
+    loot: dict
+    items: pd.DataFrame
+    edges: pd.DataFrame
+    skipped_recipes: list
+
+def run_phase1(raw):
+    """Reads inputted data and exposes quantity-aware ingredient graph"""
+    return InputData(*injest(raw))
