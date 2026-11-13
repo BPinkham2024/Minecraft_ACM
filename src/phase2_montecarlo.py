@@ -99,8 +99,68 @@ class LootSimulator:
             return self.all_trials(False)
         raise ValueError(f'Unsupported condition: {kind}')
 
-    def all_condition_ask(self, condition_list):
+    def all_condition_mask(self, condition_list):
         combined_mask = self.all_trials()
         for condition_json in condition_list:
             combined_mask &= self.condition_mask(condition_json)
         return combined_mask
+
+    def apply_functions(self, counts, functions):
+        """Apply count-changing loot functions in order on trials where conditions hold"""
+        for loot_function in functions:
+            kind = loot_function['function'].split(':')[-1]
+            function_applies = self.all_condition_mask(loot_function.get('conditions', []))
+
+            if kind == 'set_count':
+                count_amount = self.sample_ints(loot_function['count'])
+                counts = np.where(function_applies, counts + count_amount if loot_function.get('add') else count_amount, counts)
+            
+            elif kind == 'limit_count':
+                limit = loot_function['limit']
+                if isinstance(limit, int):
+                    limit = {'min': limit, 'max': limit}
+                counts = np.where(function_applies, np.clip(counts, limit.get('min', 0), limit.get('max', 2**31 - 1)), counts)
+            
+            elif kind == 'apply_bonus': #fortune 0 still gives crops binomial extras
+                if loot_function['formula'].split(':')[1] == 'binomial_with_bonus_count':
+                    bonus_params = loot_function['parameters']
+                    counts = counts + function_applies * self.rng.binomial(bonus_params['extra'], bonus_params['probability'], self.trial_count)
+                
+            elif kind in ('explosion_decay', 'looting_enchant'):
+                pass #no explosion, loting level 0
+
+            elif kind == 'furnace_smelt':
+                if function_applies.any():
+                    raise ValueError('Active smelting loot function requires a burning mob scenario')
+
+            elif kind in IGNORED_FUNCTIONS:
+                self.assumptions.add(f'Item metadata not modeled: {kind}')
+            
+            else:
+                raise ValueError(f'Unsupported loot function {kind}')
+        return np.maximum(counts, 0).astype(np.int64)
+
+    def expand_entry(self, entry, mask):
+        """Flatten entries into (leaf, mask) pairs"""
+        mask = mask & self.all_condition_mask(entry.get('conditions', []))
+        kind = entry['type'].split(':')[-1]
+        if kind == 'alternatives':
+            leaves, remaining = [], mask.copy()
+            for child in entry['children']:
+                child_leaves, succeeded_mask = self.expand_entry(child, remaining)
+                leaves += child_leaves
+                remaining &= ~succeeded_mask
+            return leaves, mask & ~remaining
+        if kind == 'tag' and entry.get('expand'):
+            return [({**entry, 'type': 'minecraft:item', 'name': item_id}, mask)
+                for item_id in sorted(resolve_tag(entry['name'], self.tags))], mask
+        return [(entry, mask)], mask
+
+    def pick_leaf_per_trial(self, leaves):
+        """Pick one leaf per trial, eligible leaves differ between trials making
+        np.random.choice's single probability vector unusable; this will compare uniform draw
+        against each column's weights"""
+        weights = np.array([mask * max(0, entry.get('weight', 1)) for entry, mask in leaves])
+        total_weight = weights.sum(axis=0)
+        random_draw = self.rng.random(self.trial_count) * total_weight
+        return (np.cumsum(weights, axis=0) <= random_draw).sum(axis=0), total_weight
