@@ -1,6 +1,7 @@
 """Phase 2: Monte carlo simulation of loot tables."""
 
 from collections import defaultdict
+from sys import prefix
 import numpy as np 
 import pandas as pd
 
@@ -32,7 +33,7 @@ class LootSimulator:
         kind = number_provider.get('type', '').split(':')[-1]
         
         if kind == 'uniform':
-            return self.rng.integers(int(number_provider['min']), int(number_provider['max'] + 1, self.trial_count))
+            return self.rng.integers(int(number_provider['min']), int(number_provider['max']) + 1, self.trial_count)
         
         if kind == 'binomial':
             return self.rng.binomial(int(number_provider['n']), number_provider['p'], self.trial_count)
@@ -78,7 +79,7 @@ class LootSimulator:
                 all_properties_match &= assumed_value == expected_vals
             return self.all_trials(all_properties_match)
         
-        if kind == 'entitiy_properties':
+        if kind == 'entity_properties':
             predicate = condition_json.get('predicate', {})
             type_specific_kind = predicate.get('type_specific', {}).get('type')
             if 'flags' in predicate:
@@ -171,9 +172,9 @@ class LootSimulator:
         """Run one loot table for the `active` trials; return {item: per-trial count array}."""
         if table_name in visiting_tables:
             raise ValueError(f'Cyclic loot table: {visiting_tables + (table_name,)}')
-        if table_name not in self.loot_tables[table_name]:
+        if table_name not in self.loot_tables:
             raise ValueError(f'Missing loot table: {table_name}')
-        loot_table = self.loot_tables[[table_name]]
+        loot_table = self.loot_tables[table_name]
         active = self.all_trials() if active is None else active
         item_counts = defaultdict(lambda: np.zeros(self.trial_count, dtype=np.int64))
         for pool in loot_table.get('pools', []):
@@ -221,3 +222,17 @@ class LootSimulator:
                     'expected_yield': counts.mean(), 'expected_actionns': actions.mean(),
                     'action_variance': actions.var(ddof=1) })
         return pd.DataFrame(rows)
+    
+def select_sources(loot_tables, recipes, scenario):
+    """Drop sources the scenario excludes, as well as mining of crafted blocks (not a free raw source)."""
+    crafted = {recipe.output for recipe in recipes} - {'minecraft:' + block_name for block_name in scenario['natural_craftable_blocks']}
+    return [source for source in sorted(loot_tables)
+            if not any(source.startswith(prefix) for prefix in scenario['excluded_source_prefixes'])
+            and not ('minecraft:' + source.removeprefix('minecraft:blocks/') in crafted
+                and source.startswith('minecraft:blocks/'))]
+
+def run_simulation(recipes, tags, loot, scenario, trials, seed):
+    simulator = LootSimulator(loot, tags, trials, seed)
+    return simulator.simulate(select_sources(loot, recipes, scenario)), sorted(simulator.assumptions)
+
+

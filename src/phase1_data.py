@@ -5,7 +5,7 @@ from typing import NamedTuple
 
 def load_dir(root):
     """Map resource id ('minecraft:path/name') -> parsed JSON for every file under root."""
-    return {'minecraft:' + path.relative_to(root).with_suffix('').as_posis(): json.loads(path.read_text())
+    return {'minecraft:' + path.relative_to(root).with_suffix('').as_posix(): json.loads(path.read_text())
             for path in sorted(root.rglob('*.json'))}
 
 def resolve_tag(tag_name, tags, visiting_tags=()):
@@ -15,14 +15,14 @@ def resolve_tag(tag_name, tags, visiting_tags=()):
     if tag_name not in tags:
         raise ValueError(f'Missing tag: {tag_name}')
     item_ids = set()
-    for value in tags[tag_name]['values']:
+    for tag_value in tags[tag_name]['values']:
         required = True
-        if isinstance(value, dict):
-            required, value = value.get('required', True), value['id']
-        if not value.startswith('#'):
-            item_ids.add(value)
-        elif required or value[1:] in tags:
-            item_ids |= resolve_tag(value[1:], tags, visiting_tags + (tag_name,))
+        if isinstance(tag_value, dict):
+            required, tag_value = tag_value.get('required', True), tag_value['id']
+        if not tag_value.startswith('#'):
+            item_ids.add(tag_value)
+        elif required or tag_value[1:] in tags:
+            item_ids |= resolve_tag(tag_value[1:], tags, visiting_tags + (tag_name,))
     return item_ids
 
 class Recipe(NamedTuple):
@@ -83,3 +83,5 @@ def read_data(raw_dir):
     for recipe in recipes:
         items.add(recipe.output)
         items.update(item_id for slot in recipe.slots for item_id in slot)
+    loot_items(list(loot.values()), items)
+    return recipes, tags, loot, sorted(items)

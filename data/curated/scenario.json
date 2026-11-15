@@ -1,0 +1,44 @@
+{
+  "name": "eligible-source-baseline",
+  "description": "Each source action assumes access to its block, mob, chest, or activity. No travel, fuel, tools, combat, spawning, or progression prerequisites are priced.",
+  "natural_craftable_blocks": [
+    "sandstone",
+    "red_sandstone",
+    "granite",
+    "diorite",
+    "andesite",
+    "snow_block",
+    "clay",
+    "moss_block",
+    "bone_block",
+    "melon",
+    "packed_ice",
+    "blue_ice",
+    "magma_block",
+    "nether_wart_block",
+    "prismarine",
+    "dark_prismarine",
+    "prismarine_bricks",
+    "quartz_block",
+    "purpur_block",
+    "end_stone_bricks",
+    "blackstone",
+    "polished_basalt",
+    "tuff",
+    "calcite",
+    "wheat",
+    "bamboo",
+    "pumpkin",
+    "nether_wart"
+  ],
+  "excluded_source_prefixes": [
+    "minecraft:gameplay/hero_of_the_village/",
+    "minecraft:gameplay/fishing/",
+    "minecraft:chests/spawn_bonus_chest"
+  ],
+  "notes": [
+    "Block tables whose block is a recipe output are excluded unless explicitly listed as naturally obtainable; this avoids free mining of crafted blocks.",
+    "Nested fishing categories are evaluated only through the root fishing activity. Other chest and entity tables represent repeatable encounters with access already available.",
+    "Special NBT recipes, item variants, trading, brewing, and world-generation acquisition paths absent from the data are not synthesized."
+  ]
+}
