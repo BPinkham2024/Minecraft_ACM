@@ -4,7 +4,7 @@ from collections import defaultdict
 import numpy as np 
 import pandas as pd
 
-from phase1_data import loot_items, resolve_tag
+from phase1_data import resolve_tag
 
 # Block-state values assumed for `block_state_property` conditions (mature crops, single block).
 STATES = {'half': 'lower', 'part': 'head', 'type': 'bottom', 'candles': '1', 'pickles': '1',
@@ -207,3 +207,17 @@ class LootSimulator:
                         item_counts[item] += count * leaf_selected_mask
         return {item: self.apply_functions(count, loot_table.get('functions', [])) * active
                 for item, count in item_counts.items()}
+
+    def simulate(self, source_names):
+        """One row per (source, item): drop probability, yield, and first-success action stats."""
+        rows = []
+        for source_name in source_names:
+            for item, counts in sorted(self.run_loot_table(source_name).items()):
+                drop_probability = np.count_nonzero(counts) / self.trial_count
+                if drop_probability > 0: # never observed so no row
+                    actions = self.rng.geometric(drop_probability, self.trial_count) #actions until first success
+                    rows.append({'item': item, 'source': source_name, 'drop_probability': drop_probability,
+                    'probability_se': np.sqrt(drop_probability * (1. - drop_probability) / self.trial_count),
+                    'expected_yield': counts.mean(), 'expected_actionns': actions.mean(),
+                    'action_variance': actions.var(ddof=1) })
+        return pd.DataFrame(rows)
