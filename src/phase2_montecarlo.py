@@ -4,6 +4,8 @@ from collections import defaultdict
 import numpy as np 
 import pandas as pd
 
+from phase1_data import loot_items, resolve_tag
+
 # Block-state values assumed for `block_state_property` conditions (mature crops, single block).
 STATES = {'half': 'lower', 'part': 'head', 'type': 'bottom', 'candles': '1', 'pickles': '1',
             'eggs': '1', 'layers': '1', 'berries': 'true', 'down': 'true', 'up': 'false',
@@ -164,3 +166,44 @@ class LootSimulator:
         total_weight = weights.sum(axis=0)
         random_draw = self.rng.random(self.trial_count) * total_weight
         return (np.cumsum(weights, axis=0) <= random_draw).sum(axis=0), total_weight
+
+    def run_loot_table(self, table_name, active=None, visiting_tables=()):
+        """Run one loot table for the `active` trials; return {item: per-trial count array}."""
+        if table_name in visiting_tables:
+            raise ValueError(f'Cyclic loot table: {visiting_tables + (table_name,)}')
+        if table_name not in self.loot_tables[table_name]:
+            raise ValueError(f'Missing loot table: {table_name}')
+        loot_table = self.loot_tables[[table_name]]
+        active = self.all_trials() if active is None else active
+        item_counts = defaultdict(lambda: np.zeros(self.trial_count, dtype=np.int64))
+        for pool in loot_table.get('pools', []):
+            pool_mask = active & self.all_condition_mask(pool.get('conditions', []))
+            rolls = self.sample_ints(pool.get('rolls', 1))
+            for roll_idx in range(int(rolls.max(initial=0))):
+                leaves = [leaf for pool_entry in pool['entries'] for leaf in self.expand_entry(pool_entry, pool_mask & (rolls > roll_idx))[0]]
+                if not leaves:
+                    continue
+                picked_leaf_idx, total_weight = self.pick_leaf_per_trial(leaves)
+                for leaf_idx, (entry, _) in enumerate(leaves):
+                    leaf_selected_mask = (picked_leaf_idx == leaf_idx) & (total_weight > 0)
+                    kind = entry['type'].split(':')[-1]
+                    if not leaf_selected_mask.any() or kind == 'empty':
+                        continue
+                    if kind == 'loot_table':
+                        drops = self.run_loot_table(entry['name'], leaf_selected_mask, visiting_tables + (table_name,))
+                    elif kind == 'item':
+                        drops = {entry['name']: np.ones(self.trial_count, dtype=np.int64)}
+                    elif kind == 'tag':
+                        drops = {item_id: np.ones(self.trial_count, dtype=np.int64) for item_id in resolve_tag(entry['name'], self.tags)}
+                    elif kind == 'dynamic':
+                        self.assumptions.add(f'Dynamic container contents excluded: {entry['name']}')
+                        continue
+                    else:
+                        raise ValueError(f'Unsupported loot entry: {kind}')
+                    
+                    for item, count in drops.items():
+                        count = self.apply_functions(count, entry.get('functions', []))
+                        count = self.apply_functions(count, pool.get('functions', []))
+                        item_counts[item] += count * leaf_selected_mask
+        return {item: self.apply_functions(count, loot_table.get('functions', [])) * active
+                for item, count in item_counts.items()}
