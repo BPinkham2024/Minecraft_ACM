@@ -16,5 +16,3 @@ if __name__ == '__main__':
     print('Phase 2: simulating loot with 10000 trials')
     scenario = json.loads((curated_dir / 'scenario.json').read_text())
     sources, assumptions = run_simulation(recipes, tags, loot, scenario, trials=10000, seed=69)
-
-    
