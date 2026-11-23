@@ -219,7 +219,7 @@ class LootSimulator:
                     actions = self.rng.geometric(drop_probability, self.trial_count) #actions until first success
                     rows.append({'item': item, 'source': source_name, 'drop_probability': drop_probability,
                     'probability_se': np.sqrt(drop_probability * (1. - drop_probability) / self.trial_count),
-                    'expected_yield': counts.mean(), 'expected_actionns': actions.mean(),
+                    'expected_yield': counts.mean(), 'expected_actions': actions.mean(),
                     'action_variance': actions.var(ddof=1) })
         return pd.DataFrame(rows)
     

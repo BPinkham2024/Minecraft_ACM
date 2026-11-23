@@ -10,11 +10,10 @@ def solve(recipes, sources, structural):
     routes = {}
     for row in sources.to_dict('records'):
         cost = 1.0 if structural else row['unit_cost']
-        if row['item'] not in routes or cost < routes[row['item']['cost']]:
+        if row['item'] not in routes or cost < routes[row['item']]['cost']:
             routes[row['item']] = dict(cost=cost, variance=0.0 if structural else row['unit_variance'],
-                                        depth=0, branching=0, raw={row['item']}, ancestors={row['item']},
-                                        route=row['source'], ingredients=[])
-
+                                       depth=0, branching=0, raw={row['item']}, ancestors={row['item']},
+                                       route=row['source'], ingredients=[])
     any_route_improved = True
     while any_route_improved:
         any_route_improved = False
@@ -35,9 +34,9 @@ def solve(recipes, sources, structural):
             routes[recipe.output] = dict(
                 cost=cost, variance=sum(ingredient_route['variance'] for ingredient_route in ingredient_routes) / recipe.count ** 2, depth=depth,
                 branching=len(set(chosen_ingredients)), raw=set.union(*(ingredient_route['raw'] for ingredient_route in ingredient_routes)),
-                ancestors={recipe.output}.union(*(ingredient_route['ancestors'] for ingredient_route in ingredient_routes))
-            )
-        any_route_improved = True
+                ancestors={recipe.output}.union(*(ingredient_route['ancestors'] for ingredient_route in ingredient_routes)),
+                route=recipe.id, ingredients=chosen_ingredients)
+            any_route_improved = True
     return routes
 
 def build_table(items, recipes, sources, lables):
@@ -49,12 +48,12 @@ def build_table(items, recipes, sources, lables):
     recipe_count, ingredients_by_output = {}, {}
     
     for recipe in recipes:
-        recipe_count[recipe.output] = recipe_count.get(recipe.outpupt, 0) + 1
+        recipe_count[recipe.output] = recipe_count.get(recipe.output, 0) + 1
         ingredients_by_output.setdefault(recipe.output, set()).update(item_id for slot in recipe.slots for item_id in slot)
     
     rows = []
     for item in items:
-        structure_route, cost_route = structure_routes.get(item), cost_routes.get(item) 
+        structure_route, cost_route = structure_routes.get(item), cost_routes.get(item)
         rows.append(dict(
             item=item, status='modeled' if cost_route else 'unresolved',
             recipe_depth=structure_route and structure_route['depth'], ingredient_branching=structure_route and structure_route['branching'],
@@ -65,8 +64,7 @@ def build_table(items, recipes, sources, lables):
             recipe_count=recipe_count.get(item, 0), graph_in_degree=len(ingredients_by_output.get(item, ()))))
     
     best_source_per_item = sources.sort_values(['unit_cost', 'source']).drop_duplicates('item').set_index('item')
-    best_source_per_item = best_source_per_item[['source', 'drop_probability', 'expected_action', 'probability_se', 'expected_yield']]
-    
+    best_source_per_item = best_source_per_item[['source', 'drop_probability', 'expected_actions', 'probability_se', 'expected_yield']]
     table = pd.DataFrame(rows).join(best_source_per_item.rename(columns={'source': 'best_direct_source'}), on='item')
     table['has_direct_source'] = table.best_direct_source.notna().astype(int)
     return table.merge(lables, on='item', how='left')
