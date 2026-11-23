@@ -1,0 +1,661 @@
+{
+  "version": 1,
+  "description": "Earliest supported access milestone, independent of frequency, time cost, annotations, and classifier outputs.",
+  "tier_definitions": {
+    "early": "Basic Overworld gathering, crafting, and ordinary encounters",
+    "mid": "Tool-gated mining, specialist stations, and Overworld exploration",
+    "late": "Nether access and configured advanced Overworld exploration",
+    "end-game": "End access and End boss rewards"
+  },
+  "assumptions": [
+    "Tier boundaries are an editable project rubric, not hardcoded per-item labels or official Minecraft stages.",
+    "Natural biome availability is assumed; search time is not priced. All supported routes are considered, including rare loot.",
+    "Nether access uses a bucket-built portal, so a diamond pickaxe is not mandatory. Lava/water availability and stronghold search are assumed at their respective milestones.",
+    "Source gates establish prerequisites, not a combat simulator or complete action plan. Reusable tools and stations are required but not consumed.",
+    "Unreviewed and placed-block sources remain excluded; missing manual actions are not invented. Empty/zero-observation loot cannot seed a route.",
+    "Minimum proof depth breaks ties within a milestone; this does not promise the fastest or cheapest route."
+  ],
+  "evidence": {
+    "recipes_and_tool_requirements": "Bundled data/raw/recipes and data/raw/tags/blocks from Java 1.20.1",
+    "smithing_reference": "https://minecraft.wiki/w/Template:Smithing/doc",
+    "mining_reference": "https://openaccess.thecvf.com/content/CVPR2025/supplemental/Li_Optimus-2_Multimodal_Minecraft_CVPR_2025_supplemental.pdf",
+    "access_policy": "Dimension/source assignments and milestone boundaries are project-authored scenario assumptions, kept separate from verified recipe inputs."
+  },
+  "gates": {
+    "crafting_table": {
+      "tier": "early",
+      "description": "a crafting table for a recipe larger than the inventory grid",
+      "items": [
+        [
+          "minecraft:crafting_table"
+        ]
+      ]
+    },
+    "furnace": {
+      "tier": "early",
+      "description": "a furnace and ordinary fuel",
+      "items": [
+        [
+          "minecraft:furnace"
+        ],
+        [
+          "minecraft:coal",
+          "minecraft:charcoal",
+          "minecraft:oak_planks",
+          "minecraft:spruce_planks",
+          "minecraft:birch_planks",
+          "minecraft:acacia_planks",
+          "minecraft:jungle_planks",
+          "minecraft:dark_oak_planks"
+        ]
+      ]
+    },
+    "blast_furnace": {
+      "tier": "mid",
+      "description": "a blast furnace and ordinary fuel",
+      "items": [
+        [
+          "minecraft:blast_furnace"
+        ],
+        [
+          "minecraft:coal",
+          "minecraft:charcoal"
+        ]
+      ]
+    },
+    "smoker": {
+      "tier": "early",
+      "description": "a smoker and ordinary fuel",
+      "items": [
+        [
+          "minecraft:smoker"
+        ],
+        [
+          "minecraft:coal",
+          "minecraft:charcoal",
+          "minecraft:oak_planks"
+        ]
+      ]
+    },
+    "campfire": {
+      "tier": "early",
+      "description": "a campfire",
+      "items": [
+        [
+          "minecraft:campfire"
+        ]
+      ]
+    },
+    "stonecutter": {
+      "tier": "mid",
+      "description": "a stonecutter",
+      "items": [
+        [
+          "minecraft:stonecutter"
+        ]
+      ]
+    },
+    "smithing_table": {
+      "tier": "mid",
+      "description": "a smithing table",
+      "items": [
+        [
+          "minecraft:smithing_table"
+        ]
+      ]
+    },
+    "pickaxe_mining": {
+      "tier": "early",
+      "description": "a pickaxe for harvesting this block",
+      "items": [
+        [
+          "minecraft:wooden_pickaxe",
+          "minecraft:stone_pickaxe",
+          "minecraft:iron_pickaxe",
+          "minecraft:golden_pickaxe",
+          "minecraft:diamond_pickaxe",
+          "minecraft:netherite_pickaxe"
+        ]
+      ]
+    },
+    "stone_mining": {
+      "tier": "early",
+      "description": "a stone-or-better harvesting pickaxe",
+      "items": [
+        [
+          "minecraft:stone_pickaxe",
+          "minecraft:iron_pickaxe",
+          "minecraft:diamond_pickaxe",
+          "minecraft:netherite_pickaxe"
+        ]
+      ]
+    },
+    "iron_mining": {
+      "tier": "mid",
+      "description": "iron-or-better mining capability",
+      "items": [
+        [
+          "minecraft:iron_pickaxe",
+          "minecraft:diamond_pickaxe",
+          "minecraft:netherite_pickaxe"
+        ]
+      ]
+    },
+    "diamond_mining": {
+      "tier": "mid",
+      "description": "diamond-or-better mining capability",
+      "items": [
+        [
+          "minecraft:diamond_pickaxe",
+          "minecraft:netherite_pickaxe"
+        ]
+      ]
+    },
+    "nether_access": {
+      "tier": "late",
+      "description": "Nether access via a bucket-built portal and ignition",
+      "items": [
+        [
+          "minecraft:bucket"
+        ],
+        [
+          "minecraft:flint_and_steel",
+          "minecraft:fire_charge"
+        ]
+      ]
+    },
+    "end_access": {
+      "tier": "end-game",
+      "description": "End access using eyes of ender",
+      "items": [
+        [
+          "minecraft:ender_eye"
+        ]
+      ]
+    },
+    "dragon_defeated": {
+      "tier": "end-game",
+      "description": "defeating the Ender Dragon after End access",
+      "items": [
+        [
+          "minecraft:ender_eye"
+        ]
+      ]
+    },
+    "overworld_exploration": {
+      "tier": "mid",
+      "description": "Overworld structure exploration (configured milestone)",
+      "items": []
+    },
+    "dangerous_encounter": {
+      "tier": "mid",
+      "description": "a dangerous Overworld encounter (configured milestone)",
+      "items": []
+    },
+    "deep_dark": {
+      "tier": "late",
+      "description": "Deep Dark exploration (configured milestone)",
+      "items": []
+    },
+    "fishing": {
+      "tier": "early",
+      "description": "a fishing rod",
+      "items": [
+        [
+          "minecraft:fishing_rod"
+        ]
+      ]
+    },
+    "bartering": {
+      "tier": "late",
+      "description": "Nether access and gold for piglin bartering",
+      "items": [
+        [
+          "minecraft:bucket"
+        ],
+        [
+          "minecraft:flint_and_steel",
+          "minecraft:fire_charge"
+        ],
+        [
+          "minecraft:gold_ingot"
+        ]
+      ]
+    },
+    "archaeology": {
+      "tier": "mid",
+      "description": "a brush for archaeology",
+      "items": [
+        [
+          "minecraft:brush"
+        ]
+      ]
+    },
+    "sniffer": {
+      "tier": "mid",
+      "description": "a sniffer hatched from an acquired egg",
+      "items": [
+        [
+          "minecraft:sniffer_egg"
+        ]
+      ]
+    },
+    "cat_gift": {
+      "tier": "early",
+      "description": "fish for taming a cat",
+      "items": [
+        [
+          "minecraft:cod",
+          "minecraft:salmon"
+        ]
+      ]
+    }
+  },
+  "recipe_gates": {
+    "smelting": [
+      "furnace"
+    ],
+    "blasting": [
+      "blast_furnace"
+    ],
+    "smoking": [
+      "smoker"
+    ],
+    "campfire_cooking": [
+      "campfire"
+    ],
+    "stonecutting": [
+      "stonecutter"
+    ],
+    "smithing_transform": [
+      "smithing_table"
+    ]
+  },
+  "source_rules": [
+    {
+      "patterns": [
+        "minecraft:blocks/ancient_debris",
+        "minecraft:blocks/basalt",
+        "minecraft:blocks/blackstone",
+        "minecraft:blocks/crimson_fungus",
+        "minecraft:blocks/crimson_nylium",
+        "minecraft:blocks/crimson_roots",
+        "minecraft:blocks/crimson_stem",
+        "minecraft:blocks/gilded_blackstone",
+        "minecraft:blocks/nether_gold_ore",
+        "minecraft:blocks/nether_quartz_ore",
+        "minecraft:blocks/nether_wart",
+        "minecraft:blocks/nether_wart_block",
+        "minecraft:blocks/netherrack",
+        "minecraft:blocks/shroomlight",
+        "minecraft:blocks/soul_sand",
+        "minecraft:blocks/soul_soil",
+        "minecraft:blocks/twisting_vines",
+        "minecraft:blocks/twisting_vines_plant",
+        "minecraft:blocks/warped_fungus",
+        "minecraft:blocks/warped_nylium",
+        "minecraft:blocks/warped_roots",
+        "minecraft:blocks/warped_stem",
+        "minecraft:blocks/warped_wart_block",
+        "minecraft:blocks/weeping_vines",
+        "minecraft:blocks/weeping_vines_plant"
+      ],
+      "gates": [
+        "nether_access"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:blocks/chorus_flower",
+        "minecraft:blocks/chorus_plant",
+        "minecraft:blocks/end_stone",
+        "minecraft:blocks/end_stone_bricks",
+        "minecraft:blocks/purpur_block",
+        "minecraft:blocks/dragon_head"
+      ],
+      "gates": [
+        "end_access"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:blocks/dragon_egg"
+      ],
+      "gates": [
+        "dragon_defeated"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:blocks/prismarine",
+        "minecraft:blocks/prismarine_bricks",
+        "minecraft:blocks/dark_prismarine",
+        "minecraft:blocks/wet_sponge"
+      ],
+      "gates": [
+        "dangerous_encounter"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:blocks/torchflower",
+        "minecraft:blocks/torchflower_crop",
+        "minecraft:blocks/pitcher_crop",
+        "minecraft:blocks/pitcher_plant"
+      ],
+      "gates": [
+        "sniffer"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:blocks/acacia_leaves",
+        "minecraft:blocks/acacia_log",
+        "minecraft:blocks/acacia_sapling",
+        "minecraft:blocks/allium",
+        "minecraft:blocks/amethyst_cluster",
+        "minecraft:blocks/andesite",
+        "minecraft:blocks/attached_melon_stem",
+        "minecraft:blocks/attached_pumpkin_stem",
+        "minecraft:blocks/azalea",
+        "minecraft:blocks/azalea_leaves",
+        "minecraft:blocks/azure_bluet",
+        "minecraft:blocks/bamboo",
+        "minecraft:blocks/bamboo_sapling",
+        "minecraft:blocks/beetroots",
+        "minecraft:blocks/bell",
+        "minecraft:blocks/big_dripleaf",
+        "minecraft:blocks/big_dripleaf_stem",
+        "minecraft:blocks/birch_leaves",
+        "minecraft:blocks/birch_log",
+        "minecraft:blocks/birch_sapling",
+        "minecraft:blocks/blue_orchid",
+        "minecraft:blocks/bone_block",
+        "minecraft:blocks/brown_mushroom",
+        "minecraft:blocks/brown_mushroom_block",
+        "minecraft:blocks/cactus",
+        "minecraft:blocks/calcite",
+        "minecraft:blocks/carrots",
+        "minecraft:blocks/carved_pumpkin",
+        "minecraft:blocks/cave_vines",
+        "minecraft:blocks/cave_vines_plant",
+        "minecraft:blocks/cherry_leaves",
+        "minecraft:blocks/cherry_log",
+        "minecraft:blocks/cherry_sapling",
+        "minecraft:blocks/clay",
+        "minecraft:blocks/coal_ore",
+        "minecraft:blocks/cobbled_deepslate",
+        "minecraft:blocks/cobblestone",
+        "minecraft:blocks/cobweb",
+        "minecraft:blocks/cocoa",
+        "minecraft:blocks/copper_ore",
+        "minecraft:blocks/cornflower",
+        "minecraft:blocks/crying_obsidian",
+        "minecraft:blocks/dandelion",
+        "minecraft:blocks/dark_oak_leaves",
+        "minecraft:blocks/dark_oak_log",
+        "minecraft:blocks/dark_oak_sapling",
+        "minecraft:blocks/deepslate_coal_ore",
+        "minecraft:blocks/deepslate_copper_ore",
+        "minecraft:blocks/deepslate_diamond_ore",
+        "minecraft:blocks/deepslate_emerald_ore",
+        "minecraft:blocks/deepslate_gold_ore",
+        "minecraft:blocks/deepslate_iron_ore",
+        "minecraft:blocks/deepslate_lapis_ore",
+        "minecraft:blocks/deepslate_redstone_ore",
+        "minecraft:blocks/diamond_ore",
+        "minecraft:blocks/diorite",
+        "minecraft:blocks/dirt",
+        "minecraft:blocks/dirt_path",
+        "minecraft:blocks/emerald_ore",
+        "minecraft:blocks/fern",
+        "minecraft:blocks/flowering_azalea",
+        "minecraft:blocks/flowering_azalea_leaves",
+        "minecraft:blocks/gold_ore",
+        "minecraft:blocks/granite",
+        "minecraft:blocks/grass",
+        "minecraft:blocks/grass_block",
+        "minecraft:blocks/gravel",
+        "minecraft:blocks/iron_ore",
+        "minecraft:blocks/jungle_leaves",
+        "minecraft:blocks/jungle_log",
+        "minecraft:blocks/jungle_sapling",
+        "minecraft:blocks/kelp",
+        "minecraft:blocks/kelp_plant",
+        "minecraft:blocks/lapis_ore",
+        "minecraft:blocks/large_fern",
+        "minecraft:blocks/lilac",
+        "minecraft:blocks/lily_of_the_valley",
+        "minecraft:blocks/lily_pad",
+        "minecraft:blocks/magma_block",
+        "minecraft:blocks/mangrove_leaves",
+        "minecraft:blocks/mangrove_log",
+        "minecraft:blocks/mangrove_roots",
+        "minecraft:blocks/melon",
+        "minecraft:blocks/melon_stem",
+        "minecraft:blocks/moss_block",
+        "minecraft:blocks/mud",
+        "minecraft:blocks/mycelium",
+        "minecraft:blocks/oak_leaves",
+        "minecraft:blocks/oak_log",
+        "minecraft:blocks/oak_sapling",
+        "minecraft:blocks/obsidian",
+        "minecraft:blocks/orange_tulip",
+        "minecraft:blocks/oxeye_daisy",
+        "minecraft:blocks/peony",
+        "minecraft:blocks/pink_petals",
+        "minecraft:blocks/pink_tulip",
+        "minecraft:blocks/podzol",
+        "minecraft:blocks/pointed_dripstone",
+        "minecraft:blocks/polished_basalt",
+        "minecraft:blocks/poppy",
+        "minecraft:blocks/potatoes",
+        "minecraft:blocks/pumpkin",
+        "minecraft:blocks/pumpkin_stem",
+        "minecraft:blocks/red_mushroom",
+        "minecraft:blocks/red_mushroom_block",
+        "minecraft:blocks/red_sand",
+        "minecraft:blocks/red_sandstone",
+        "minecraft:blocks/red_tulip",
+        "minecraft:blocks/redstone_ore",
+        "minecraft:blocks/rooted_dirt",
+        "minecraft:blocks/rose_bush",
+        "minecraft:blocks/sand",
+        "minecraft:blocks/sandstone",
+        "minecraft:blocks/sea_pickle",
+        "minecraft:blocks/snow_block",
+        "minecraft:blocks/spore_blossom",
+        "minecraft:blocks/spruce_leaves",
+        "minecraft:blocks/spruce_log",
+        "minecraft:blocks/spruce_sapling",
+        "minecraft:blocks/sugar_cane",
+        "minecraft:blocks/sunflower",
+        "minecraft:blocks/sweet_berry_bush",
+        "minecraft:blocks/tall_grass",
+        "minecraft:blocks/tuff",
+        "minecraft:blocks/wheat",
+        "minecraft:blocks/white_tulip"
+      ],
+      "gates": [],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:entities/blaze",
+        "minecraft:entities/ghast",
+        "minecraft:entities/hoglin",
+        "minecraft:entities/magma_cube",
+        "minecraft:entities/strider",
+        "minecraft:entities/wither_skeleton",
+        "minecraft:entities/zoglin",
+        "minecraft:entities/zombified_piglin"
+      ],
+      "gates": [
+        "nether_access"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:entities/shulker"
+      ],
+      "gates": [
+        "end_access"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:entities/elder_guardian",
+        "minecraft:entities/guardian",
+        "minecraft:entities/evoker",
+        "minecraft:entities/iron_golem",
+        "minecraft:entities/ravager",
+        "minecraft:entities/vindicator"
+      ],
+      "gates": [
+        "dangerous_encounter"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:entities/warden"
+      ],
+      "gates": [
+        "deep_dark"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:entities/cat",
+        "minecraft:entities/cave_spider",
+        "minecraft:entities/chicken",
+        "minecraft:entities/cod",
+        "minecraft:entities/cow",
+        "minecraft:entities/creeper",
+        "minecraft:entities/dolphin",
+        "minecraft:entities/donkey",
+        "minecraft:entities/drowned",
+        "minecraft:entities/enderman",
+        "minecraft:entities/glow_squid",
+        "minecraft:entities/horse",
+        "minecraft:entities/husk",
+        "minecraft:entities/llama",
+        "minecraft:entities/mooshroom",
+        "minecraft:entities/mule",
+        "minecraft:entities/panda",
+        "minecraft:entities/parrot",
+        "minecraft:entities/phantom",
+        "minecraft:entities/pig",
+        "minecraft:entities/polar_bear",
+        "minecraft:entities/pufferfish",
+        "minecraft:entities/rabbit",
+        "minecraft:entities/salmon",
+        "minecraft:entities/sheep",
+        "minecraft:entities/skeleton",
+        "minecraft:entities/slime",
+        "minecraft:entities/spider",
+        "minecraft:entities/squid",
+        "minecraft:entities/stray",
+        "minecraft:entities/trader_llama",
+        "minecraft:entities/tropical_fish",
+        "minecraft:entities/turtle",
+        "minecraft:entities/witch",
+        "minecraft:entities/zombie",
+        "minecraft:entities/zombie_villager",
+        "minecraft:entities/sheep/*"
+      ],
+      "gates": [],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:chests/end_city_treasure"
+      ],
+      "gates": [
+        "end_access"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:chests/bastion_*",
+        "minecraft:chests/nether_bridge"
+      ],
+      "gates": [
+        "nether_access"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:chests/ancient_city*"
+      ],
+      "gates": [
+        "deep_dark"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:chests/*"
+      ],
+      "gates": [
+        "overworld_exploration"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:archaeology/*"
+      ],
+      "gates": [
+        "archaeology"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:gameplay/piglin_bartering"
+      ],
+      "gates": [
+        "bartering"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:gameplay/fishing"
+      ],
+      "gates": [
+        "fishing"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:gameplay/sniffer_digging"
+      ],
+      "gates": [
+        "sniffer"
+      ],
+      "reason": "Reviewed source access"
+    },
+    {
+      "patterns": [
+        "minecraft:gameplay/cat_morning_gift"
+      ],
+      "gates": [
+        "cat_gift"
+      ],
+      "reason": "Reviewed source access"
+    }
+  ]
+}
