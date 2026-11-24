@@ -25,8 +25,8 @@ def regression(modeled_items, seed):
     log_cost = np.log1p(modeled_items.expected_cost)
     metrics = {}
     for name, model in models.items():
-        model = make_pipeline(StandardScaler(), model).fit(modeled_items.log[train_rows, STRUCTURAL], log_cost[train_rows])
-        predicted_cost = np.maximum(0, np.expm1(model.predict(modeled_items.log[test_rows, STRUCTURAL])))
+        model = make_pipeline(StandardScaler(), model).fit(modeled_items.loc[train_rows, STRUCTURAL], log_cost[train_rows])
+        predicted_cost = np.maximum(0, np.expm1(model.predict(modeled_items.loc[test_rows, STRUCTURAL])))
         actual_cost = modeled_items.loc[test_rows, 'expected_cost']
         metrics[name] = {'mae_actions': mean_absolute_error(actual_cost, predicted_cost),
                             'rsme_actions': np.sqrt(mean_squared_error(actual_cost, predicted_cost)),
@@ -37,10 +37,9 @@ def regression(modeled_items, seed):
 def classification(modeled_items, seed):
     """predict tier lables from all acquisition features"""
     labeled = modeled_items[modeled_items.tier.notna()]
-    tier_counts = labeled.tier.value_counts()
-    
+        
     train_rows, test_rows = train_test_split(labeled.index, test_size=.3, stratify=labeled.tier, random_state=seed)
-    models = {'baseline': DummyClassifier(strategy='most_frequenst'),
+    models = {'baseline': DummyClassifier(strategy='most_frequent'),
                 'random_forest': RandomForestClassifier(n_estimators=160, min_samples_leaf=2,
                                                         class_weight='balanced', random_state=seed)}
     metrics = {}
@@ -48,7 +47,7 @@ def classification(modeled_items, seed):
         model = make_pipeline(StandardScaler(), model).fit(modeled_items.loc[train_rows, ACQUISITION], modeled_items.loc[train_rows, 'tier'])
         predicted_tiers, actual_tiers = model.predict(modeled_items.loc[test_rows, ACQUISITION]), modeled_items.loc[test_rows, 'tier']
         metrics[name] = {'accurace': accuracy_score(actual_tiers, predicted_tiers),
-                            'macro_f1': f1_score(actual_tiers, predicted_tiers),
+                            'macro_f1': f1_score(actual_tiers, predicted_tiers, labels=TIERS, average='macro', zero_division=0),
                             'confusion_matrix': confusion_matrix(actual_tiers, predicted_tiers, labels=TIERS).tolist()}
         return metrics | {'train_items': len(train_rows), 'test_items': len(test_rows), 'tiers': TIERS}
 
